@@ -7,19 +7,19 @@
 #include "PluginManager.hpp"
 
 void PluginManager::loadAll() {
-    std::vector<std::string> plugins = {"libpluginA.so", "libpluginB.so", "libpluginC.so"};
+    std::vector<std::string> plugins = {"pluginA", "pluginB", "pluginC"};
 
     for(auto&& name : plugins) {
         std::cout << "Loading plugin " << name << std::endl;
 #ifdef WIN32
-        auto handle = LoadLibrary(name.c_str());
+        auto handle = LoadLibrary((name + ".dll").c_str());
         if(!handle) {
             std::cout << "Failed to load plugin: " << std::endl;
             continue;
         }
         auto load = (std::shared_ptr<Plugin> (*)())GetProcAddress(handle, "load");
 #else
-        auto handle = dlopen(name.c_str(), RTLD_LAZY);
+        auto handle = dlopen(("lib" + name + ".so").c_str(), RTLD_LAZY);
         if(!handle) {
             std::cout << "Failed to load plugin: " << dlerror() << std::endl;
             continue;
