@@ -22,9 +22,9 @@ set_target_properties(pluginB PROPERTIES INCLUDE_DIRECTORIES "${PROJECT_SOURCE_D
 generate_export_header(pluginB EXPORT_FILE_NAME PluginBExport.hpp)
 
 # Executable to load the plugins
-add_executable(test main.cpp PluginManager.hpp PluginManager.cpp)
+add_executable(run main.cpp PluginManager.hpp PluginManager.cpp)
 if(NOT WIN32)
     set(LIBRARIES dl)
 endif()
-target_link_libraries(test common ${LIBRARIES})
-add_dependencies(test pluginA pluginB)
+target_link_libraries(run common ${LIBRARIES})
+add_dependencies(run pluginA pluginB)
