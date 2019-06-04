@@ -17,21 +17,27 @@ void PluginManager::loadAll() {
             std::cout << "Failed to load plugin: " << std::endl;
             continue;
         }
-        auto load = (std::shared_ptr<Plugin> (*)())GetProcAddress(handle, "load");
+        auto load = (Plugin* (*)())GetProcAddress(handle, "load");
+        if(!load) {
+            FreeLibrary(handle);
+            std::cout << "Failed to get adress to load function: " << std::endl;
+            continue;
+        }
 #else
         auto handle = dlopen(("lib" + name + ".so").c_str(), RTLD_LAZY);
         if(!handle) {
             std::cout << "Failed to load plugin: " << dlerror() << std::endl;
             continue;
         }
-        auto load = (std::shared_ptr<Plugin> (*)())dlsym(handle, "load");
+        auto load = (Plugin* (*)())dlsym(handle, "load");
         if(!load) {
-            std::cout << "Failed to load plugin: " << dlerror() << std::endl;
+            dlclose(handle);
+            std::cout << "Failed to get address of load function: " << dlerror() << std::endl;
             continue;
         }
 #endif
         auto object = load();
-        m_plugins[object->getName()] = object;
+        m_plugins[object->getName()] = std::shared_ptr<Plugin>(object);
         //_get_name = (char* (*)())dlsym(handle, "name");
         //_get_version = (char* (*)())dlsym(handle, "version");
     }
